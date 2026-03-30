@@ -273,7 +273,7 @@ export default function Home() {
 
         <button
           onClick={downloadCSV}
-          className="w-full mb-8 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all"
+          className="w-full mb-4 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all"
         >
           ⬇ Download Today's Attendance (CSV)
         </button>
