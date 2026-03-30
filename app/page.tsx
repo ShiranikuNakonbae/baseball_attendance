@@ -194,7 +194,7 @@ export default function Home() {
         <div className="text-center mb-8">
           <span className="text-5xl">⚾</span>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">
-            Team Attendance
+            Team Attendance For:
           </h1>
           <p className="text-gray-400 text-sm mt-1">{today}</p>
         </div>
