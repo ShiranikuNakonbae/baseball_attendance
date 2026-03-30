@@ -6,8 +6,9 @@ export const redis = new Redis({
 });
 
 export const getTodayKey = () => {
-  // Uses UTC+7 (WIB) for Indonesia
-  const now = new Date(Date.now() + 7 * 60 * 60 * 1000);
-  const date = now.toISOString().split("T")[0];
+  // "en-CA" gives YYYY-MM-DD format
+  const date = new Date().toLocaleDateString("en-CA", {
+    timeZone: "Asia/Jakarta",
+  });
   return `attendance:${date}`;
 };

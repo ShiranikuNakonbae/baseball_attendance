@@ -71,10 +71,13 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
 
-  const today = new Date(Date.now() + 7 * 60 * 60 * 1000).toLocaleDateString(
-    "en-US",
-    { weekday: "long", year: "numeric", month: "long", day: "numeric" },
-  );
+  const today = new Date().toLocaleDateString("en-US", {
+    timeZone: "Asia/Jakarta",
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
   const fetchAttendance = useCallback(async () => {
     const res = await fetch("/api/attendance", { cache: "no-store" });
@@ -112,15 +115,13 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `attendance-${new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().split("T")[0]}.csv`;
+    a.download = `attendance-${new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })}.csv`
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const downloadMonthlyCSV = async () => {
-    const month = new Date(Date.now() + 7 * 60 * 60 * 1000)
-      .toISOString()
-      .slice(0, 7); // "2026-03"
+    const month = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }).slice(0, 7)
     const res = await fetch(`/api/attendance/monthly?month=${month}`);
     const { csv, days } = await res.json();
     if (!csv) return alert("No data found for this month.");
