@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const entries = await Promise.all(
     keys.map(async (key) => {
       const date = key.replace("attendance:", "");
-      const data = (await redis.hgetall(key)) ?? {};
+      const data = ((await redis.hgetall(key)) ?? {}) as Record<string, string>;
       return { date, data };
     }),
   );
