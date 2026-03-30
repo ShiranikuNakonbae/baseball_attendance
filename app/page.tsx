@@ -70,14 +70,21 @@ export default function Home() {
   const [attendance, setAttendance] = useState<AttendanceMap>({});
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [today, setToday] = useState("");
 
-  const today = new Date().toLocaleDateString("en-US", {
-    timeZone: "Asia/Jakarta",
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
+  useEffect(() => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    setToday(
+      tomorrow.toLocaleDateString("en-US", {
+        timeZone: "Asia/Jakarta",
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    );
+  }, []);
 
   const fetchAttendance = useCallback(async () => {
     const res = await fetch("/api/attendance", { cache: "no-store" });
@@ -115,13 +122,17 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `attendance-${new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })}.csv`;
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    a.download = `attendance-${tomorrow.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const downloadMonthlyCSV = async () => {
-    const month = new Date()
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const month = tomorrow
       .toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })
       .slice(0, 7);
     const res = await fetch(`/api/attendance/monthly?month=${month}`);
@@ -227,7 +238,7 @@ export default function Home() {
         <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
           Athletes
         </p>
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-3 gap-3 mb-6">
           {[
             {
               label: "Total",
@@ -258,26 +269,29 @@ export default function Home() {
           ))}
         </div>
 
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
-          <span>Filled in</span>
-          <span>
-            {totalFilled} / {allMembers.length}
-          </span>
-        </div>
-        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-blue-400 rounded-full transition-all duration-500"
-            style={{ width: `${(totalFilled / allMembers.length) * 100}%` }}
-          />
+        {/* Progress Bar */}
+        <div className="mb-6">
+          <div className="flex justify-between text-xs text-gray-400 mb-1">
+            <span>Filled in</span>
+            <span>
+              {totalFilled} / {allMembers.length}
+            </span>
+          </div>
+          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-400 rounded-full transition-all duration-500"
+              style={{ width: `${(totalFilled / allMembers.length) * 100}%` }}
+            />
+          </div>
         </div>
 
+        {/* Download Buttons */}
         <button
           onClick={downloadCSV}
           className="w-full mb-4 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all"
         >
           ⬇ Download Today's Attendance (CSV)
         </button>
-
         <button
           onClick={downloadMonthlyCSV}
           className="w-full mb-8 py-2.5 rounded-xl bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 transition-all"
@@ -285,6 +299,7 @@ export default function Home() {
           📅 Download This Month's Attendance (CSV)
         </button>
 
+        {/* Member Lists */}
         {loading ? (
           <div className="text-center text-gray-300 py-16 text-lg">
             Loading...
