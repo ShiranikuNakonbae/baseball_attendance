@@ -99,6 +99,24 @@ export default function Home() {
     setUpdating(null);
   };
 
+  const downloadCSV = () => {
+    const rows = [["Name", "Role", "Status", "Date"]];
+    TEAM.coaches.forEach((m) => {
+      rows.push([m.name, "Coach", attendance[m.id] ?? "not filled", today]);
+    });
+    TEAM.athletes.forEach((m) => {
+      rows.push([m.name, "Athlete", attendance[m.id] ?? "not filled", today]);
+    });
+    const csv = rows.map((r) => r.join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attendance-${new Date(Date.now() + 7 * 60 * 60 * 1000).toISOString().split("T")[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const allMembers = [...TEAM.coaches, ...TEAM.athletes];
   const filled = allMembers.filter((m) => attendance[m.id]).length;
   const present = allMembers.filter(
@@ -184,6 +202,13 @@ export default function Home() {
             />
           </div>
         </div>
+
+        <button
+          onClick={downloadCSV}
+          className="w-full mb-8 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all"
+        >
+          ⬇ Download Today's Attendance (CSV)
+        </button>
 
         {loading ? (
           <div className="text-center text-gray-300 py-16 text-lg">
