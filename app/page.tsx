@@ -117,6 +117,23 @@ export default function Home() {
     URL.revokeObjectURL(url);
   };
 
+  const downloadMonthlyCSV = async () => {
+    const month = new Date(Date.now() + 7 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 7); // "2026-03"
+    const res = await fetch(`/api/attendance/monthly?month=${month}`);
+    const { csv, days } = await res.json();
+    if (!csv) return alert("No data found for this month.");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attendance-${month}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert(`Downloaded ${days} day(s) of data.`);
+  };
+
   const allMembers = [...TEAM.coaches, ...TEAM.athletes];
   const filled = allMembers.filter((m) => attendance[m.id]).length;
   const present = allMembers.filter(
@@ -208,6 +225,13 @@ export default function Home() {
           className="w-full mb-8 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all"
         >
           ⬇ Download Today's Attendance (CSV)
+        </button>
+
+        <button
+          onClick={downloadMonthlyCSV}
+          className="w-full mb-8 py-2.5 rounded-xl bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 transition-all"
+        >
+          📅 Download This Month's Attendance (CSV)
         </button>
 
         {loading ? (
