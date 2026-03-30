@@ -115,13 +115,15 @@ export default function Home() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `attendance-${new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })}.csv`
+    a.download = `attendance-${new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   };
 
   const downloadMonthlyCSV = async () => {
-    const month = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }).slice(0, 7)
+    const month = new Date()
+      .toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" })
+      .slice(0, 7);
     const res = await fetch(`/api/attendance/monthly?month=${month}`);
     const { csv, days } = await res.json();
     if (!csv) return alert("No data found for this month.");
@@ -136,11 +138,24 @@ export default function Home() {
   };
 
   const allMembers = [...TEAM.coaches, ...TEAM.athletes];
-  const filled = allMembers.filter((m) => attendance[m.id]).length;
-  const present = allMembers.filter(
+
+  const coachFilled = TEAM.coaches.filter((m) => attendance[m.id]).length;
+  const coachPresent = TEAM.coaches.filter(
     (m) => attendance[m.id] === "present",
   ).length;
-  const absent = allMembers.filter((m) => attendance[m.id] === "absent").length;
+  const coachAbsent = TEAM.coaches.filter(
+    (m) => attendance[m.id] === "absent",
+  ).length;
+
+  const athleteFilled = TEAM.athletes.filter((m) => attendance[m.id]).length;
+  const athletePresent = TEAM.athletes.filter(
+    (m) => attendance[m.id] === "present",
+  ).length;
+  const athleteAbsent = TEAM.athletes.filter(
+    (m) => attendance[m.id] === "absent",
+  ).length;
+
+  const totalFilled = coachFilled + athleteFilled;
 
   const renderSection = (title: string, emoji: string, members: Member[]) => (
     <section className="mb-8">
@@ -173,24 +188,27 @@ export default function Home() {
           <p className="text-gray-400 text-sm mt-1">{today}</p>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        {/* Coach Stats */}
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+          Coaches
+        </p>
+        <div className="grid grid-cols-3 gap-3 mb-4">
           {[
             {
               label: "Total",
-              value: allMembers.length,
+              value: TEAM.coaches.length,
               color: "text-gray-800",
               bg: "bg-white",
             },
             {
               label: "Present",
-              value: present,
+              value: coachPresent,
               color: "text-green-600",
               bg: "bg-green-50",
             },
             {
               label: "Absent",
-              value: absent,
+              value: coachAbsent,
               color: "text-red-500",
               bg: "bg-red-50",
             },
@@ -205,20 +223,52 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Progress bar */}
-        <div className="mb-8">
-          <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>Filled in</span>
-            <span>
-              {filled} / {allMembers.length}
-            </span>
-          </div>
-          <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+        {/* Athlete Stats */}
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+          Athletes
+        </p>
+        <div className="grid grid-cols-3 gap-3 mb-8">
+          {[
+            {
+              label: "Total",
+              value: TEAM.athletes.length,
+              color: "text-gray-800",
+              bg: "bg-white",
+            },
+            {
+              label: "Present",
+              value: athletePresent,
+              color: "text-green-600",
+              bg: "bg-green-50",
+            },
+            {
+              label: "Absent",
+              value: athleteAbsent,
+              color: "text-red-500",
+              bg: "bg-red-50",
+            },
+          ].map((s) => (
             <div
-              className="h-full bg-blue-400 rounded-full transition-all duration-500"
-              style={{ width: `${(filled / allMembers.length) * 100}%` }}
-            />
-          </div>
+              key={s.label}
+              className={`${s.bg} rounded-2xl p-4 text-center border border-gray-100`}
+            >
+              <div className={`text-3xl font-bold ${s.color}`}>{s.value}</div>
+              <div className="text-xs text-gray-400 mt-0.5">{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex justify-between text-xs text-gray-400 mb-1">
+          <span>Filled in</span>
+          <span>
+            {totalFilled} / {allMembers.length}
+          </span>
+        </div>
+        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-blue-400 rounded-full transition-all duration-500"
+            style={{ width: `${(totalFilled / allMembers.length) * 100}%` }}
+          />
         </div>
 
         <button
