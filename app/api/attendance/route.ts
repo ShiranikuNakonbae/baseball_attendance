@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { redis, getTodayKey } from "@/lib/redis";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const key = getTodayKey();
   const data = await redis.hgetall(key);

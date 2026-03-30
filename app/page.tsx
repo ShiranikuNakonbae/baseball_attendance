@@ -77,7 +77,7 @@ export default function Home() {
   );
 
   const fetchAttendance = useCallback(async () => {
-    const res = await fetch("/api/attendance");
+    const res = await fetch("/api/attendance", { cache: "no-store" });
     const data = await res.json();
     setAttendance(data);
     setLoading(false);
