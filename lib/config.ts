@@ -33,6 +33,7 @@ export const TEAM: {
     { id: "hilya", name: "Hilya" },
     { id: "alif", name: "Alif" },
     { id: "reiner", name: "Reiner" },
+    { id: "misyka", name: "Misyka" },
     { id: "dekai", name: "Dekai" },
     { id: "andra", name: "Andra" },
     { id: "gilar", name: "Gilar" },
