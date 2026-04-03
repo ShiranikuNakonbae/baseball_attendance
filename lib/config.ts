@@ -5,8 +5,8 @@ export const TEAM: {
   athletes: Member[];
 } = {
   coaches: [
-    { id: "coach-dafiq", name: "Coach Dafiq" },
-    { id: "coach-fajar", name: "Coach Fajar" },
+    // { id: "coach-dafiq", name: "Coach Dafiq" },
+    // { id: "coach-fajar", name: "Coach Fajar" },
     { id: "coach-apuy", name: "Coach Apuy" },
     { id: "coach-iki", name: "Coach Iki" },
   ],
