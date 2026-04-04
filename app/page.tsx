@@ -300,7 +300,7 @@ export default function Home() {
             Team Attendance
           </h1>
           <p className="text-gray-400 text-xs mt-1">
-            Cutoff: {weekend?.cutoff ?? "—"} (Monday)
+            Cutoff: {weekend?.cutoff ?? "—"}
           </p>
         </div>
 
@@ -323,7 +323,7 @@ export default function Home() {
                   : "text-gray-500 hover:text-gray-700"
               }`}
             >
-              {day === "saturday" ? "⚾ Saturday" : "🏟 Sunday"}
+              {day === "saturday" ? "Saturday" : "Sunday"}
               {weekend && (
                 <span className="block text-xs font-normal opacity-60">
                   {weekend[day]}
