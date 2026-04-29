@@ -248,23 +248,25 @@ export default function Home() {
     a.download = `attendance-${date}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  };
-
-  const downloadMonthlyCSV = async () => {
-    if (!weekend) return;
-    const month = weekend.saturday.slice(0, 7);
-    const res = await fetch(`/api/attendance/monthly?month=${month}`);
-    const { csv, days } = await res.json();
-    if (!csv) return alert("No data found for this month.");
-    const blob = new Blob([csv], { type: "text/csv" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `attendance-${month}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    alert(`Downloaded ${days} day(s) of data.`);
-  };
+  
+  const downloadMonthlyCSV = async (monthOffset: number) => {
+  if (!weekend) return
+  const base = new Date(weekend.saturday + "T00:00:00")
+  base.setMonth(base.getMonth() + monthOffset)
+  const month = base.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }).slice(0, 7)
+  const monthLabel = base.toLocaleDateString("en-US", { month: "long", year: "numeric" })
+  const res = await fetch(`/api/attendance/monthly?month=${month}`)
+  const { csv, days } = await res.json()
+  if (!csv) return alert(`No data found for ${monthLabel}.`)
+  const blob = new Blob([csv], { type: "text/csv" })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement("a")
+  a.href = url
+  a.download = `attendance-${month}.csv`
+  a.click()
+  URL.revokeObjectURL(url)
+  alert(`Downloaded ${days} day(s) of data for ${monthLabel}.`)
+}
 
   const att = attendance[activeDay];
   const date = weekend?.[activeDay] ?? "";
@@ -368,7 +370,7 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Download Buttons */}
+    {/* Download Buttons */}
         <button
           onClick={() => downloadCSV(activeDay)}
           className="w-full mb-4 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all"
@@ -376,12 +378,20 @@ export default function Home() {
           ⬇ Download {activeDay === "saturday" ? "Saturday" : "Sunday"}'s
           Attendance (CSV)
         </button>
-        <button
-          onClick={downloadMonthlyCSV}
-          className="w-full mb-8 py-2.5 rounded-xl bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 transition-all"
-        >
-          📅 Download This Month's Attendance (CSV)
-        </button>
+        <div className="flex gap-3 mb-8">
+          <button
+            onClick={() => downloadMonthlyCSV(-1)}
+            className="flex-1 py-2.5 rounded-xl bg-violet-400 text-white text-sm font-semibold hover:bg-violet-500 transition-all"
+          >
+            📅 Last Month
+          </button>
+          <button
+            onClick={() => downloadMonthlyCSV(0)}
+            className="flex-1 py-2.5 rounded-xl bg-violet-500 text-white text-sm font-semibold hover:bg-violet-600 transition-all"
+          >
+            📅 This Month
+          </button>
+        </div>
 
         {/* Member Lists */}
         {loading ? (
@@ -433,4 +443,5 @@ export default function Home() {
       </div>
     </main>
   );
+}
 }
