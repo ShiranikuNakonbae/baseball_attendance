@@ -100,24 +100,9 @@ function StatGrid({
   return (
     <div className="grid grid-cols-3 gap-3 mb-4">
       {[
-        {
-          label: "Total",
-          value: total,
-          color: "text-gray-800",
-          bg: "bg-white",
-        },
-        {
-          label: "Present",
-          value: present,
-          color: "text-green-600",
-          bg: "bg-green-50",
-        },
-        {
-          label: "Absent",
-          value: absent,
-          color: "text-red-500",
-          bg: "bg-red-50",
-        },
+        { label: "Total",   value: total,   color: "text-gray-800",  bg: "bg-white"    },
+        { label: "Present", value: present, color: "text-green-600", bg: "bg-green-50" },
+        { label: "Absent",  value: absent,  color: "text-red-500",   bg: "bg-red-50"   },
       ].map((s) => (
         <div
           key={s.label}
@@ -135,10 +120,7 @@ export default function Home() {
   const [attendance, setAttendance] = useState<{
     saturday: AttendanceMap;
     sunday: AttendanceMap;
-  }>({
-    saturday: {},
-    sunday: {},
-  });
+  }>({ saturday: {}, sunday: {} });
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [activeDay, setActiveDay] = useState<"saturday" | "sunday">("saturday");
@@ -152,9 +134,9 @@ export default function Home() {
     const day = jakarta.getDay();
 
     const sat = new Date(jakarta);
-    if (day === 0) sat.setDate(jakarta.getDate() - 1);
+    if (day === 0)      sat.setDate(jakarta.getDate() - 1);
     else if (day === 1) sat.setDate(jakarta.getDate() - 2);
-    else if (day < 6) sat.setDate(jakarta.getDate() + (6 - day));
+    else if (day < 6)   sat.setDate(jakarta.getDate() + (6 - day));
 
     const sun = new Date(sat);
     sun.setDate(sat.getDate() + 1);
@@ -211,11 +193,7 @@ export default function Home() {
     if (weekend) fetchAll(weekend.saturday, weekend.sunday);
   }, [weekend, fetchAll]);
 
-  const mark = async (
-    id: string,
-    status: Status,
-    day: "saturday" | "sunday",
-  ) => {
+  const mark = async (id: string, status: Status, day: "saturday" | "sunday") => {
     if (!weekend || weekend.isLocked) return;
     const date = weekend[day];
     setUpdating(`${day}-${id}`);
@@ -229,6 +207,7 @@ export default function Home() {
     setUpdating(null);
   };
 
+  // ← closed properly with its own }
   const downloadCSV = (day: "saturday" | "sunday") => {
     if (!weekend) return;
     const att = attendance[day];
@@ -248,61 +227,50 @@ export default function Home() {
     a.download = `attendance-${date}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-  
+  }; // ← this was missing, causing downloadMonthlyCSV to be nested inside
+
+  // ← now correctly a separate top-level function
   const downloadMonthlyCSV = async (monthOffset: number) => {
-  if (!weekend) return
-  const base = new Date(weekend.saturday + "T00:00:00")
-  base.setMonth(base.getMonth() + monthOffset)
-  const month = base.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }).slice(0, 7)
-  const monthLabel = base.toLocaleDateString("en-US", { month: "long", year: "numeric" })
-  const res = await fetch(`/api/attendance/monthly?month=${month}`)
-  const { csv, days } = await res.json()
-  if (!csv) return alert(`No data found for ${monthLabel}.`)
-  const blob = new Blob([csv], { type: "text/csv" })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement("a")
-  a.href = url
-  a.download = `attendance-${month}.csv`
-  a.click()
-  URL.revokeObjectURL(url)
-  alert(`Downloaded ${days} day(s) of data for ${monthLabel}.`)
-}
+    if (!weekend) return;
+    const base = new Date(weekend.saturday + "T00:00:00");
+    base.setMonth(base.getMonth() + monthOffset);
+    const month = base.toLocaleDateString("en-CA", { timeZone: "Asia/Jakarta" }).slice(0, 7);
+    const monthLabel = base.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    const res = await fetch(`/api/attendance/monthly?month=${month}`);
+    const { csv, days } = await res.json();
+    if (!csv) return alert(`No data found for ${monthLabel}.`);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `attendance-${month}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert(`Downloaded ${days} day(s) of data for ${monthLabel}.`);
+  };
 
-const att = attendance[activeDay];
-const activeDate = weekend?.[activeDay] ?? "";
-const isLocked = weekend?.isLocked ?? false;
+  const att = attendance[activeDay];
+  const activeDate = weekend?.[activeDay] ?? "";
+  const isLocked = weekend?.isLocked ?? false;
 
-  const coachPresent = TEAM.coaches.filter(
-    (m) => att[m.id] === "present",
-  ).length;
-  const coachAbsent = TEAM.coaches.filter((m) => att[m.id] === "absent").length;
-  const athPresent = TEAM.athletes.filter(
-    (m) => att[m.id] === "present",
-  ).length;
-  const athAbsent = TEAM.athletes.filter((m) => att[m.id] === "absent").length;
+  const coachPresent = TEAM.coaches.filter((m) => att[m.id] === "present").length;
+  const coachAbsent  = TEAM.coaches.filter((m) => att[m.id] === "absent").length;
+  const athPresent   = TEAM.athletes.filter((m) => att[m.id] === "present").length;
+  const athAbsent    = TEAM.athletes.filter((m) => att[m.id] === "absent").length;
 
-  const allMembers = [...TEAM.coaches, ...TEAM.athletes];
+  const allMembers  = [...TEAM.coaches, ...TEAM.athletes];
   const totalFilled = allMembers.filter((m) => att[m.id]).length;
-
-  const displayDate = (dateStr: string) =>
-    new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-      year: "numeric",
-    });
 
   return (
     <main className="min-h-screen bg-gray-50">
       <div className="max-w-sm mx-auto px-4 py-10">
+
         {/* Header */}
         <div className="text-center mb-6">
           <span className="text-5xl">⚾</span>
-          <h1 className="text-2xl font-bold text-gray-900 mt-2">
-            Team Attendance
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 mt-2">Team Attendance</h1>
           <p className="text-gray-400 text-xs mt-1">
-            Cutoff: {weekend?.cutoff ?? "—"}
+            Cutoff: {weekend?.cutoff ?? "—"} (Monday)
           </p>
         </div>
 
@@ -336,31 +304,17 @@ const isLocked = weekend?.isLocked ?? false;
         </div>
 
         {/* Stats */}
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-          Coaches
-        </p>
-        <StatGrid
-          total={TEAM.coaches.length}
-          present={coachPresent}
-          absent={coachAbsent}
-        />
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Coaches</p>
+        <StatGrid total={TEAM.coaches.length} present={coachPresent} absent={coachAbsent} />
 
-        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
-          Athletes
-        </p>
-        <StatGrid
-          total={TEAM.athletes.length}
-          present={athPresent}
-          absent={athAbsent}
-        />
+        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Athletes</p>
+        <StatGrid total={TEAM.athletes.length} present={athPresent} absent={athAbsent} />
 
         {/* Progress Bar */}
         <div className="mb-6">
           <div className="flex justify-between text-xs text-gray-400 mb-1">
             <span>Filled in</span>
-            <span>
-              {totalFilled} / {allMembers.length}
-            </span>
+            <span>{totalFilled} / {allMembers.length}</span>
           </div>
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
             <div
@@ -370,13 +324,12 @@ const isLocked = weekend?.isLocked ?? false;
           </div>
         </div>
 
-    {/* Download Buttons */}
+        {/* Download Buttons */}
         <button
           onClick={() => downloadCSV(activeDay)}
           className="w-full mb-4 py-2.5 rounded-xl bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-all"
         >
-          ⬇ Download {activeDay === "saturday" ? "Saturday" : "Sunday"}'s
-          Attendance (CSV)
+          ⬇ Download {activeDay === "saturday" ? "Saturday" : "Sunday"}'s Attendance (CSV)
         </button>
         <div className="flex gap-3 mb-8">
           <button
@@ -395,9 +348,7 @@ const isLocked = weekend?.isLocked ?? false;
 
         {/* Member Lists */}
         {loading ? (
-          <div className="text-center text-gray-300 py-16 text-lg">
-            Loading...
-          </div>
+          <div className="text-center text-gray-300 py-16 text-lg">Loading...</div>
         ) : (
           <>
             <section className="mb-8">
@@ -443,5 +394,4 @@ const isLocked = weekend?.isLocked ?? false;
       </div>
     </main>
   );
-}
 }
