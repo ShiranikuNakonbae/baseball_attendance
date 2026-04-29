@@ -268,9 +268,9 @@ export default function Home() {
   alert(`Downloaded ${days} day(s) of data for ${monthLabel}.`)
 }
 
-  const att = attendance[activeDay];
-  const date = weekend?.[activeDay] ?? "";
-  const isLocked = weekend?.isLocked ?? false;
+const att = attendance[activeDay];
+const activeDate = weekend?.[activeDay] ?? "";
+const isLocked = weekend?.isLocked ?? false;
 
   const coachPresent = TEAM.coaches.filter(
     (m) => att[m.id] === "present",
