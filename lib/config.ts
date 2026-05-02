@@ -22,6 +22,7 @@ export const TEAM: {
     { id: "keenan", name: "Keenan" },
     { id: "habibie", name: "Habibie" },
     { id: "zen", name: "Zen" },
+    { id: "kidung", name: "Kidung" },
     { id: "luna", name: "Luna" },
     { id: "ghazi", name: "Ghazi" },
     { id: "caca", name: "Caca" },
