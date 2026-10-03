@@ -41,6 +41,10 @@ export const TEAM: {
     { id: "dekai", name: "Dekai" },
     { id: "andra", name: "Andra" },
     { id: "gilar", name: "Gilar" },
-    { id: "faiza", name: "Faizan" },
+    { id: "faizan", name: "Faizan" },
+    { id: "ezan", name: "Fahrezan" },
+    { id: "saga", name: "Sagara" },
+    { id: "ara", name: "Shankara" },
+    { id: "bella", name: "Bella Akbar" },
   ],
 };
