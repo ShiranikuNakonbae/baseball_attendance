@@ -10,6 +10,8 @@ export const TEAM: {
     { id: "coach-apuy", name: "Coach Apuy" },
     { id: "coach-iki", name: "Coach Iki" },
     { id: "coach-husain", name: "Coach Husain" },
+    { id: "coach-raihan", name: "Coach Raihan" },
+
 
   ],
   athletes: [
@@ -46,5 +48,7 @@ export const TEAM: {
     { id: "saga", name: "Sagara" },
     { id: "ara", name: "Shankara" },
     { id: "bella", name: "Bella Akbar" },
+    { id: "yusuf", name: "Yusuf" },
+    { id: "rifki", name: "Rifki" },
   ],
 };
