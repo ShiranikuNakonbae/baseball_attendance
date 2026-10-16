@@ -50,5 +50,8 @@ export const TEAM: {
     { id: "bella", name: "Bella Akbar" },
     { id: "yusuf", name: "Yusuf" },
     { id: "rifki", name: "Rifki" },
+    { id: "irsyad", name: "Irsyad" },
+
+
   ],
 };
